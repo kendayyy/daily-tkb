@@ -11,23 +11,11 @@ type Props = {
   periods: Period[];
   entries: CellEntry[];
   stickers: BoardSticker[];
-  paper: string;
+  paperCard: string;
   onClose: () => void;
 };
 
-function weekRangeLabel(): string {
-  const now = new Date();
-  const mondayOffset = (now.getDay() + 6) % 7;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - mondayOffset);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  const fmt = (d: Date) =>
-    `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
-  return `${fmt(monday)} – ${fmt(sunday)}`;
-}
-
-function ExportBoard({
+function TimetableCapture({
   periods,
   entries,
   stickers,
@@ -37,58 +25,46 @@ function ExportBoard({
   stickers: BoardSticker[];
 }) {
   return (
-    <div className="bg-paper p-6" style={{ width: EXPORT_WIDTH }}>
-      <h2 className="type-panel">Thời khóa biểu tuần</h2>
-      <p className="mb-4 mt-1 type-note text-ink-soft">{weekRangeLabel()}</p>
-      <div className="relative">
-        <WeekGrid periods={periods} entries={entries} exportMode />
-        {stickers.map((sticker) => (
-          <span
-            key={sticker.id}
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none"
-            style={{
-              left: `${sticker.x}%`,
-              top: `${sticker.y}%`,
-              fontSize: sticker.size,
-              lineHeight: 1,
-            }}
-          >
-            {sticker.emoji}
-          </span>
-        ))}
-      </div>
+    <div className="relative" style={{ width: EXPORT_WIDTH }}>
+      <WeekGrid periods={periods} entries={entries} exportMode />
+      {stickers.map((sticker) => (
+        <span
+          key={sticker.id}
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none"
+          style={{
+            left: `${sticker.x}%`,
+            top: `${sticker.y}%`,
+            fontSize: sticker.size,
+            lineHeight: 1,
+          }}
+        >
+          {sticker.emoji}
+        </span>
+      ))}
     </div>
   );
 }
 
-async function composeOriented(
+async function scaleTable(
   dataUrl: string,
   orientation: "landscape" | "portrait",
-  paper: string,
+  paperCard: string,
 ): Promise<string> {
   const img = new Image();
   img.src = dataUrl;
   await img.decode();
 
-  const pad = 48;
   const targetW = orientation === "portrait" ? 1080 : 1920;
-  const minH =
-    orientation === "portrait"
-      ? Math.round((targetW * 16) / 9)
-      : Math.round((targetW * 9) / 16);
-
-  const scale = (targetW - pad * 2) / img.width;
-  const drawW = targetW - pad * 2;
-  const drawH = Math.round(img.height * scale);
+  const scale = targetW / img.width;
+  const targetH = Math.max(1, Math.round(img.height * scale));
   const canvas = document.createElement("canvas");
   canvas.width = targetW;
-  canvas.height = Math.max(minH, drawH + pad * 2);
+  canvas.height = targetH;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Không tạo được ảnh");
-  ctx.fillStyle = paper;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const y = Math.round((canvas.height - drawH) / 2);
-  ctx.drawImage(img, pad, y, drawW, drawH);
+  ctx.fillStyle = paperCard;
+  ctx.fillRect(0, 0, targetW, targetH);
+  ctx.drawImage(img, 0, 0, targetW, targetH);
   return canvas.toDataURL("image/png");
 }
 
@@ -123,7 +99,7 @@ export function ExportPreview({
   periods,
   entries,
   stickers,
-  paper,
+  paperCard,
   onClose,
 }: Props) {
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -175,7 +151,7 @@ export function ExportPreview({
                   const dataUrl = await toPng(node, {
                     cacheBust: true,
                     pixelRatio,
-                    backgroundColor: paper,
+                    backgroundColor: paperCard,
                     width,
                     height,
                     style: {
@@ -188,10 +164,10 @@ export function ExportPreview({
                   if (!dataUrl || dataUrl.length < 100) {
                     throw new Error("Ảnh trống");
                   }
-                  const framed = await composeOriented(
+                  const framed = await scaleTable(
                     dataUrl,
                     orientation,
-                    paper,
+                    paperCard,
                   );
                   await savePng(framed);
                 } catch (err) {
@@ -235,12 +211,11 @@ export function ExportPreview({
           </button>
         </div>
         <p className="mb-2 shrink-0 type-note text-ink-soft">
-          Vuốt xem đủ 7 ngày. {orientation === "portrait" ? "Ảnh dọc 9:16" : "Ảnh ngang 16:9"}
-          , lưới không bị cắt.
+          Chỉ xuất cái bảng TKB (đủ 7 ngày). Vuốt xem trước, rồi Tải PNG.
         </p>
-        <div className="min-h-[220px] overflow-auto rounded-card border border-line">
+        <div className="min-h-[220px] overflow-auto rounded-card border border-line bg-paper-card">
           <div ref={nodeRef}>
-            <ExportBoard
+            <TimetableCapture
               periods={periods}
               entries={entries}
               stickers={stickers}

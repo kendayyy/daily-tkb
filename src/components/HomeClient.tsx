@@ -158,7 +158,7 @@ export function HomeClient() {
           periods={periods}
           entries={entries}
           stickers={boardStickers}
-          paper={theme.paper}
+          paperCard={theme.paperCard}
           onClose={() => setExportOpen(false)}
         />
       ) : null}
