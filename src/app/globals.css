@@ -27,6 +27,21 @@ html,
 body {
   background: var(--paper);
   color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+label,
+a {
+  touch-action: manipulation;
+}
+
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 @layer utilities {

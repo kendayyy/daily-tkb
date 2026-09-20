@@ -10,6 +10,12 @@ export interface Period {
   endTime?: string;
 }
 
+export interface TodoItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
 export interface CellEntry {
   id: string;
   periodId: string;
@@ -18,6 +24,7 @@ export interface CellEntry {
   category: Category;
   color?: string;
   note?: string;
+  todos?: TodoItem[];
   startTime?: string;
   endTime?: string;
   sticker?: string;
@@ -42,21 +49,24 @@ export interface Theme {
   lineSoft: string;
 }
 
+export type PhoneLayout = "doc" | "ngang";
+
 export interface AppState {
   periods: Period[];
   entries: CellEntry[];
   theme: Theme;
   boardStickers: BoardSticker[];
+  phoneLayout: PhoneLayout;
 }
 
-export const DAYS: { day: DayIndex; label: string }[] = [
-  { day: 0, label: "Thứ 2" },
-  { day: 1, label: "Thứ 3" },
-  { day: 2, label: "Thứ 4" },
-  { day: 3, label: "Thứ 5" },
-  { day: 4, label: "Thứ 6" },
-  { day: 5, label: "Thứ 7" },
-  { day: 6, label: "CN" },
+export const DAYS: { day: DayIndex; label: string; short: string }[] = [
+  { day: 0, label: "Thứ 2", short: "T2" },
+  { day: 1, label: "Thứ 3", short: "T3" },
+  { day: 2, label: "Thứ 4", short: "T4" },
+  { day: 3, label: "Thứ 5", short: "T5" },
+  { day: 4, label: "Thứ 6", short: "T6" },
+  { day: 5, label: "Thứ 7", short: "T7" },
+  { day: 6, label: "CN", short: "CN" },
 ];
 
 export const CATEGORIES: Category[] = ["hoc", "lam", "nha", "khac"];

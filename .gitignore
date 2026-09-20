@@ -3,6 +3,8 @@
 node_modules
 .next
 out
+cpanel
+cpanel-upload.zip
 dist
 *.local
 .DS_Store

@@ -1,0 +1,33 @@
+Daily TKB - Host tren cPanel
+============================
+
+Day la web TINH (HTML/CSS/JS). Khong can Node.js tren hosting.
+
+Cach nhanh: upload file cpanel-upload.zip
+
+1) cPanel -> File Manager -> vao public_html
+   (hoac document root cua subdomain, vi du tkb.example.com)
+
+2) Xoa file mac dinh cu neu can (index.html cu)
+
+3) Upload cpanel-upload.zip
+
+4) Click phai zip -> Extract (giai nen ngay trong public_html)
+   Sau khi extract phai thay: index.html, 404.html, favicon.svg,
+   .htaccess, thu muc _next
+
+5) Bat "Show Hidden Files" de kiem tra .htaccess da co
+
+6) Xoa file zip tren hosting neu muon. Mo domain.
+
+Khong extract thanh public_html/cpanel-upload/...
+File phai nam truc tiep trong public_html.
+
+Neu khong dung zip: upload TOAN BO NOI DUNG trong thu muc cpanel
+(khong upload chinh folder cpanel).
+
+Khong host trong thu muc con (example.com/tkb/). Hay dung subdomain.
+
+Du lieu TKB luu o localStorage tren trinh duyet, khong luu tren server.
+
+Sau nay sua code: chay lai build-cpanel.bat roi upload zip moi, extract de.

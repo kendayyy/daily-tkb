@@ -19,7 +19,9 @@ type Props = {
   entries: CellEntry[];
   selected?: Selection;
   onOpenJob?: (periodId: string, day: DayIndex, entryId?: string) => void;
+  onToggleTodo?: (entryId: string, todoId: string) => void;
   exportMode?: boolean;
+  compact?: boolean;
 };
 
 export function WeekGrid({
@@ -27,7 +29,9 @@ export function WeekGrid({
   entries,
   selected,
   onOpenJob,
+  onToggleTodo,
   exportMode,
+  compact,
 }: Props) {
   const rows = [...periods].sort((a, b) => a.order - b.order);
   const today = todayIndex();
@@ -37,14 +41,16 @@ export function WeekGrid({
       className={
         exportMode
           ? "overflow-visible rounded-card bg-paper-card p-5"
-          : "overflow-x-auto overscroll-x-contain rounded-card bg-paper-card p-3 landscape:p-2 md:p-5"
+          : "overflow-x-auto overscroll-x-contain rounded-card bg-paper-card p-3 [-webkit-overflow-scrolling:touch] landscape:p-2 md:p-5"
       }
     >
       <table
         className={
           exportMode
             ? "w-full table-fixed border-separate border-spacing-1"
-            : "w-full min-w-[920px] border-separate border-spacing-1 landscape:min-w-[840px]"
+            : compact
+              ? "w-full min-w-[720px] border-separate border-spacing-1 md:min-w-[920px]"
+              : "w-full min-w-[920px] border-separate border-spacing-1 landscape:min-w-[840px]"
         }
       >
         <thead>
@@ -65,7 +71,8 @@ export function WeekGrid({
                     : "bg-[#F7F5EE] text-ink-soft"
                 }`}
               >
-                {d.label}
+                <span className={compact ? "md:hidden" : "hidden"}>{d.short}</span>
+                <span className={compact ? "hidden md:inline" : ""}>{d.label}</span>
               </th>
             ))}
           </tr>
@@ -100,6 +107,7 @@ export function WeekGrid({
                         selectedId={isSelected ? selected?.entryId : undefined}
                         staticRender={exportMode}
                         onOpenJob={(id) => onOpenJob?.(period.id, d.day, id)}
+                        onToggleTodo={onToggleTodo}
                         onAdd={() => onOpenJob?.(period.id, d.day)}
                       />
                     ) : exportMode ? (

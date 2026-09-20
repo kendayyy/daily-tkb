@@ -11,11 +11,16 @@ import {
   type CellEntry,
   type DayIndex,
   type Period,
+  type PhoneLayout,
   type Theme,
 } from "./types";
 
+type EntryPatch = Partial<Omit<CellEntry, "id" | "periodId" | "day">>;
+
 type TkbStore = AppState & {
   upsertEntry: (entry: Omit<CellEntry, "id"> & { id?: string }) => void;
+  patchEntry: (id: string, patch: EntryPatch) => void;
+  toggleTodo: (entryId: string, todoId: string) => void;
   deleteEntry: (id: string) => void;
   addPeriod: (name?: string) => void;
   renamePeriod: (id: string, name: string) => void;
@@ -23,6 +28,7 @@ type TkbStore = AppState & {
   movePeriod: (id: string, direction: -1 | 1) => void;
   deletePeriod: (id: string) => void;
   setTheme: (theme: Theme) => void;
+  setPhoneLayout: (layout: PhoneLayout) => void;
   addBoardSticker: (emoji: string) => void;
   moveBoardSticker: (id: string, x: number, y: number) => void;
   removeBoardSticker: (id: string) => void;
@@ -39,6 +45,7 @@ export const useTkbStore = create<TkbStore>()(
       entries: [],
       theme: defaultTheme(),
       boardStickers: [],
+      phoneLayout: "doc",
       upsertEntry: (entry) => {
         const id = entry.id ?? crypto.randomUUID();
         const next: CellEntry = {
@@ -49,6 +56,7 @@ export const useTkbStore = create<TkbStore>()(
           category: entry.category as Category,
           color: entry.color,
           note: entry.note,
+          todos: entry.todos ?? [],
           startTime: entry.startTime,
           endTime: entry.endTime,
           sticker: entry.sticker,
@@ -58,6 +66,25 @@ export const useTkbStore = create<TkbStore>()(
           return { entries: [...without, next] };
         });
       },
+      patchEntry: (id, patch) =>
+        set((state) => ({
+          entries: state.entries.map((item) =>
+            item.id === id ? { ...item, ...patch } : item,
+          ),
+        })),
+      toggleTodo: (entryId, todoId) =>
+        set((state) => ({
+          entries: state.entries.map((item) =>
+            item.id !== entryId
+              ? item
+              : {
+                  ...item,
+                  todos: (item.todos ?? []).map((todo) =>
+                    todo.id === todoId ? { ...todo, done: !todo.done } : todo,
+                  ),
+                },
+          ),
+        })),
       deleteEntry: (id) =>
         set((state) => ({
           entries: state.entries.filter((item) => item.id !== id),
@@ -112,6 +139,7 @@ export const useTkbStore = create<TkbStore>()(
           entries: state.entries.filter((e) => e.periodId !== id),
         })),
       setTheme: (theme) => set({ theme }),
+      setPhoneLayout: (phoneLayout) => set({ phoneLayout }),
       addBoardSticker: (emoji) =>
         set((state) => ({
           boardStickers: [
@@ -152,8 +180,12 @@ export const useTkbStore = create<TkbStore>()(
           ...p,
           theme: p.theme ?? current.theme,
           boardStickers: p.boardStickers ?? [],
+          phoneLayout: p.phoneLayout === "ngang" ? "ngang" : "doc",
           periods: p.periods ?? current.periods,
-          entries: p.entries ?? current.entries,
+          entries: (p.entries ?? current.entries).map((item) => ({
+            ...item,
+            todos: item.todos ?? [],
+          })),
         };
       },
     },
