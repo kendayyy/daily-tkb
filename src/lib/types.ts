@@ -133,16 +133,24 @@ export const BOARD_STICKERS = [
   "🧸",
 ];
 
+export const THEME_LABELS: Record<string, string> = {
+  kem: "Kem giấy",
+  sage: "Lá",
+  navy: "Xanh mực",
+  rose: "Hồng",
+  custom: "Tùy chọn",
+};
+
 export const THEME_PRESETS: Theme[] = [
   {
     id: "kem",
-    paper: "#FBF9F4",
-    paperCard: "#FFFFFF",
-    ink: "#232A26",
-    inkSoft: "#6B7570",
-    inkFaint: "#A7ADA8",
-    line: "#E7E2D6",
-    lineSoft: "#F0ECE1",
+    paper: "#F7F3EA",
+    paperCard: "#FFFCF7",
+    ink: "#1C2420",
+    inkSoft: "#5F6A64",
+    inkFaint: "#9AA39C",
+    line: "#E4DDD0",
+    lineSoft: "#EFE9DC",
   },
   {
     id: "sage",
@@ -194,6 +202,21 @@ export function hexToBg(hex: string): string {
 export function formatHours(start?: string, end?: string): string {
   if (start && end) return `${start}–${end}`;
   return start || end || "";
+}
+
+export function formatDayDate(day: DayIndex): string {
+  const now = new Date();
+  const mondayOffset = (now.getDay() + 6) % 7;
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - mondayOffset + day);
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export function dayNumber(day: DayIndex): string {
+  return formatDayDate(day).slice(0, 2);
+}
+
+export function weekRangeLabel(): string {
+  return `${formatDayDate(0)} – ${formatDayDate(6)}`;
 }
 
 export function applyTheme(theme: Theme) {

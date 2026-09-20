@@ -109,18 +109,18 @@ export function EditorSheet({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/30 p-0 max-md:landscape:items-stretch max-md:landscape:justify-end md:items-center md:p-4"
+      className="sheet-overlay fixed inset-0 z-[60] flex items-end justify-center p-0 max-md:landscape:items-stretch max-md:landscape:justify-end md:items-center md:p-4"
       onClick={onClose}
       role="presentation"
     >
       <div
         role="dialog"
         aria-labelledby="editor-title"
-        className="flex max-h-[92dvh] w-full max-w-[480px] flex-col rounded-t-card bg-paper-card shadow-sheet max-md:landscape:h-full max-md:landscape:max-h-none max-md:landscape:w-[min(420px,85vw)] max-md:landscape:rounded-none md:max-h-[90dvh] md:rounded-card"
+        className="flex max-h-[92dvh] w-full max-w-[480px] flex-col rounded-t-card border border-line/60 bg-paper-card shadow-sheet max-md:landscape:h-full max-md:landscape:max-h-none max-md:landscape:w-[min(420px,85vw)] max-md:landscape:rounded-none md:max-h-[90dvh] md:rounded-card"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="shrink-0 px-5 pt-3 md:pt-5">
-          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line md:hidden" />
+          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-line md:hidden" />
           <h2 id="editor-title" className="type-panel">
             {existing ? "Sửa việc" : "Thêm việc"}
           </h2>
@@ -168,24 +168,6 @@ export function EditorSheet({
             })}
           </div>
 
-          <p className="mb-2 type-note text-ink-soft">Màu</p>
-          <div className="mb-4 flex flex-wrap gap-2">
-            {COLOR_SWATCHES.map((hex) => (
-              <button
-                key={hex}
-                type="button"
-                aria-label={hex}
-                onClick={() => setColor(hex)}
-                className={`h-10 w-10 rounded-full border-2 md:h-7 md:w-7 ${
-                  color.toLowerCase() === hex.toLowerCase()
-                    ? "border-ink"
-                    : "border-transparent"
-                }`}
-                style={{ background: hex }}
-              />
-            ))}
-          </div>
-
           <div className="mb-4 grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1.5 type-note text-ink-soft">
               Bắt đầu
@@ -207,30 +189,59 @@ export function EditorSheet({
             </label>
           </div>
 
-          <p className="mb-2 type-note text-ink-soft">Sticker ô</p>
-          <div className="mb-4 flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => setSticker("")}
-              className={`h-11 w-11 rounded-cell border type-note md:h-9 md:w-9 ${
-                !sticker ? "border-ink" : "border-line"
-              }`}
-            >
-              —
-            </button>
-            {CELL_STICKERS.map((item) => (
+          <details
+            className="mb-4"
+            open={Boolean(
+              (existing?.color &&
+                existing.color !== CATEGORY_COLORS[existing.category]) ||
+                existing?.sticker,
+            )}
+          >
+            <summary className="cursor-pointer select-none type-note text-ink-soft">
+              Màu và sticker
+            </summary>
+            <p className="mb-2 mt-3 type-note text-ink-soft">Màu</p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {COLOR_SWATCHES.map((hex) => (
+                <button
+                  key={hex}
+                  type="button"
+                  aria-label={hex}
+                  onClick={() => setColor(hex)}
+                  className={`h-10 w-10 rounded-full border-2 md:h-7 md:w-7 ${
+                    color.toLowerCase() === hex.toLowerCase()
+                      ? "border-ink"
+                      : "border-transparent"
+                  }`}
+                  style={{ background: hex }}
+                />
+              ))}
+            </div>
+            <p className="mb-2 type-note text-ink-soft">Sticker ô</p>
+            <div className="flex flex-wrap gap-1.5">
               <button
-                key={item}
                 type="button"
-                onClick={() => setSticker(item)}
-                className={`h-11 w-11 rounded-cell border text-lg md:h-9 md:w-9 ${
-                  sticker === item ? "border-ink" : "border-line"
+                onClick={() => setSticker("")}
+                className={`h-11 w-11 rounded-cell border type-note md:h-9 md:w-9 ${
+                  !sticker ? "border-ink" : "border-line"
                 }`}
               >
-                {item}
+                —
               </button>
-            ))}
-          </div>
+              {CELL_STICKERS.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setSticker(item)}
+                  className={`h-11 w-11 rounded-cell border text-lg md:h-9 md:w-9 ${
+                    sticker === item ? "border-ink" : "border-line"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </details>
 
           <label className="mb-4 flex flex-col gap-1.5 type-note text-ink-soft">
             Ghi chú

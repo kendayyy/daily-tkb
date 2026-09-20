@@ -32,8 +32,10 @@ const config: Config = {
         mono: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        sheet: "0 16px 48px rgba(35, 42, 38, 0.12)",
-        selected: "0 0 0 2px var(--hoc), 0 0 12px rgba(59, 130, 246, 0.22)",
+        sheet: "0 24px 64px rgba(28, 36, 32, 0.18)",
+        selected: "0 0 0 2px var(--hoc), 0 0 16px rgba(59, 130, 246, 0.18)",
+        card: "0 1px 0 rgba(28, 36, 32, 0.04), 0 10px 28px rgba(28, 36, 32, 0.06)",
+        float: "0 8px 24px rgba(28, 36, 32, 0.08)",
       },
     },
   },

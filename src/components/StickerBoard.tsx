@@ -68,7 +68,7 @@ export function StickerBoard({
         ))}
       </div>
       {decorate ? (
-        <div className="mt-3 rounded-card border border-line bg-paper-card p-3">
+        <div className="mt-3 rounded-card border border-line bg-paper-card p-3.5 shadow-card">
           <p className="mb-2 type-note text-ink-soft">
             Bấm emoji để dán lên tờ TKB. Kéo để đặt vị trí. Double-click để gỡ.
           </p>

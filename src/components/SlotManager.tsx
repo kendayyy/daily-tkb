@@ -29,14 +29,14 @@ export function SlotManager({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/30 max-md:landscape:items-stretch max-md:landscape:justify-end md:items-center"
+      className="sheet-overlay fixed inset-0 z-[60] flex items-end justify-center max-md:landscape:items-stretch max-md:landscape:justify-end md:items-center md:p-4"
       onClick={onClose}
       role="presentation"
     >
       <div
         role="dialog"
         aria-labelledby="slots-title"
-        className="h-[min(92vh,720px)] w-full max-w-[480px] overflow-auto rounded-t-card bg-paper-card p-5 shadow-sheet max-md:landscape:h-full max-md:landscape:max-h-none max-md:landscape:w-[min(420px,85vw)] max-md:landscape:rounded-none md:h-auto md:rounded-card"
+        className="h-[min(92vh,720px)] w-full max-w-[480px] overflow-auto rounded-t-card border border-line/60 bg-paper-card p-5 shadow-sheet max-md:landscape:h-full max-md:landscape:max-h-none max-md:landscape:w-[min(420px,85vw)] max-md:landscape:rounded-none md:h-auto md:rounded-card"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="slots-title" className="type-panel mb-4">
@@ -48,7 +48,7 @@ export function SlotManager({
             return (
               <li
                 key={period.id}
-                className="flex flex-col gap-2 rounded-cell border border-line-soft px-2 py-2"
+                className="flex flex-col gap-2 rounded-cell border border-line bg-paper px-3 py-3"
               >
                 <div className="flex items-center gap-2">
                 <span className="w-6 font-mono text-[12px] font-medium text-ink-faint">
@@ -132,7 +132,7 @@ export function SlotManager({
         <button
           type="button"
           onClick={onAdd}
-          className="mt-4 w-full rounded-cell border border-dashed border-line py-3 type-btn text-ink-soft hover:bg-[#F7F5EF]"
+          className="ui-btn mt-4 w-full rounded-cell border border-dashed border-line py-3 type-btn text-ink-soft hover:bg-line-soft"
         >
           + Thêm buổi mới
         </button>

@@ -41,7 +41,7 @@ export function CellJobs({
         <button
           type="button"
           onClick={onAdd}
-          className="min-h-8 rounded-cell text-[12px] font-medium text-ink-faint hover:bg-[#F7F5EF] hover:text-ink"
+          className="ui-btn min-h-8 rounded-cell text-[12px] font-medium text-ink-faint hover:bg-line-soft hover:text-ink"
         >
           + thêm việc
         </button>
@@ -74,6 +74,7 @@ function JobRow({
       : CATEGORY_BG[entry.category];
   const hours = formatHours(entry.startTime, entry.endTime);
   const todos = visibleTodos(entry.todos);
+  const done = todos.filter((todo) => todo.done).length;
 
   return (
     <div
@@ -92,6 +93,8 @@ function JobRow({
             note={entry.note}
             category={entry.category}
             accent={accent}
+            todoCount={todos.length}
+            todoDone={done}
           />
         </div>
       ) : (
@@ -103,6 +106,8 @@ function JobRow({
             note={entry.note}
             category={entry.category}
             accent={accent}
+            todoCount={todos.length}
+            todoDone={done}
           />
         </button>
       )}
@@ -152,6 +157,8 @@ function JobMeta({
   note,
   category,
   accent,
+  todoCount,
+  todoDone,
 }: {
   title: string;
   sticker?: string;
@@ -159,6 +166,8 @@ function JobMeta({
   note?: string;
   category: CellEntry["category"];
   accent: string;
+  todoCount?: number;
+  todoDone?: number;
 }) {
   return (
     <>
@@ -178,8 +187,15 @@ function JobMeta({
           {note.trim()}
         </p>
       ) : null}
-      <div className="type-tag" style={{ color: accent }}>
-        {CATEGORY_LABELS[category]}
+      <div className="mt-0.5 flex items-center gap-1.5">
+        <div className="type-tag" style={{ color: accent }}>
+          {CATEGORY_LABELS[category]}
+        </div>
+        {todoCount ? (
+          <span className="font-mono text-[10px] text-ink-faint">
+            {todoDone}/{todoCount}
+          </span>
+        ) : null}
       </div>
     </>
   );

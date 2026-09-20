@@ -5,6 +5,7 @@ import { CellJobs } from "@/components/CellFilled";
 import { findEntries } from "@/lib/store";
 import {
   DAYS,
+  dayNumber,
   formatHours,
   todayIndex,
   type CellEntry,
@@ -40,24 +41,26 @@ export function WeekGrid({
     <div
       className={
         exportMode
-          ? "overflow-visible rounded-card bg-paper-card p-5"
-          : "overflow-x-auto overscroll-x-contain rounded-card bg-paper-card p-3 [-webkit-overflow-scrolling:touch] landscape:p-2 md:p-5"
+          ? "overflow-visible rounded-card border border-line bg-paper-card p-5"
+          : compact
+            ? "overflow-x-auto overscroll-x-contain rounded-card border border-line/80 bg-paper-card p-3 shadow-card [-webkit-overflow-scrolling:touch]"
+            : "overflow-visible rounded-card border border-line/80 bg-paper-card p-3 shadow-card md:p-5"
       }
     >
       <table
         className={
           exportMode
-            ? "w-full table-fixed border-separate border-spacing-1"
+            ? "w-full table-fixed border-separate border-spacing-1.5"
             : compact
-              ? "w-full min-w-[720px] border-separate border-spacing-1 md:min-w-[920px]"
-              : "w-full min-w-[920px] border-separate border-spacing-1 landscape:min-w-[840px]"
+              ? "w-full min-w-[640px] table-fixed border-separate border-spacing-1 md:min-w-0"
+              : "w-full table-fixed border-separate border-spacing-1.5"
         }
       >
         <thead>
           <tr>
             <th
-              className={`w-[96px] min-w-[96px] bg-[#F7F5EE] px-2 py-2 text-left type-label font-semibold text-ink-soft landscape:w-[84px] landscape:py-1.5 ${
-                exportMode ? "" : "sticky left-0 z-10"
+              className={`w-[72px] min-w-[72px] rounded-cell bg-line-soft px-2 py-2 text-left text-[12px] font-semibold text-ink-soft md:w-[104px] md:min-w-[104px] md:px-2.5 md:py-2.5 md:text-[13px] ${
+                exportMode || !compact ? "" : "sticky left-0 z-10"
               }`}
             >
               Buổi
@@ -65,14 +68,18 @@ export function WeekGrid({
             {DAYS.map((d) => (
               <th
                 key={d.day}
-                className={`px-2 py-2 text-center type-label font-semibold landscape:py-1.5 ${
+                className={`rounded-cell px-1 py-2 text-center font-semibold md:px-2 md:py-2.5 ${
                   d.day === today
                     ? "bg-hoc-bg text-hoc"
-                    : "bg-[#F7F5EE] text-ink-soft"
+                    : "bg-line-soft text-ink-soft"
                 }`}
               >
-                <span className={compact ? "md:hidden" : "hidden"}>{d.short}</span>
-                <span className={compact ? "hidden md:inline" : ""}>{d.label}</span>
+                <div className="text-[11px] md:text-[13px]">
+                  {compact ? d.short : d.label}
+                </div>
+                <div className="mt-0.5 font-mono text-[10px] font-medium opacity-80">
+                  {dayNumber(d.day)}
+                </div>
               </th>
             ))}
           </tr>
@@ -81,13 +88,13 @@ export function WeekGrid({
           {rows.map((period) => (
             <tr key={period.id}>
               <th
-                className={`bg-paper-card px-2 py-2 text-left type-label font-semibold text-ink landscape:py-1 ${
-                  exportMode ? "" : "sticky left-0 z-10"
+                className={`rounded-cell bg-paper-card px-2 py-2 text-left type-label font-semibold text-ink md:px-2.5 md:py-2.5 ${
+                  exportMode || !compact ? "" : "sticky left-0 z-10"
                 }`}
               >
                 <div>{period.name}</div>
                 {formatHours(period.startTime, period.endTime) ? (
-                  <div className="mt-1 font-mono text-[10px] font-medium text-ink-soft">
+                  <div className="mt-1 font-mono text-[10px] font-medium leading-tight text-ink-soft">
                     {formatHours(period.startTime, period.endTime)}
                   </div>
                 ) : null}
@@ -96,10 +103,15 @@ export function WeekGrid({
                 const jobs = findEntries(entries, period.id, d.day);
                 const isSelected =
                   selected?.periodId === period.id && selected.day === d.day;
+                const isToday = d.day === today;
                 return (
                   <td
                     key={`${period.id}-${d.day}`}
-                    className="relative z-0 min-w-[118px] border border-line-soft bg-paper-card p-0 align-top"
+                    className={`relative z-0 rounded-cell border p-0 align-top ${
+                      isToday
+                        ? "border-hoc/25 bg-hoc-bg/40"
+                        : "border-line-soft bg-paper-card"
+                    }`}
                   >
                     {jobs.length > 0 ? (
                       <CellJobs

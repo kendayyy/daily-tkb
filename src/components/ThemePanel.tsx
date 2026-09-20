@@ -1,6 +1,6 @@
 "use client";
 
-import { applyTheme, THEME_PRESETS, type Theme } from "@/lib/types";
+import { applyTheme, THEME_LABELS, THEME_PRESETS, type Theme } from "@/lib/types";
 
 type Props = {
   theme: Theme;
@@ -11,13 +11,13 @@ type Props = {
 export function ThemePanel({ theme, onChange, onClose }: Props) {
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/30 md:items-center"
+      className="sheet-overlay fixed inset-0 z-[60] flex items-end justify-center md:items-center md:p-4"
       onClick={onClose}
       role="presentation"
     >
       <div
         role="dialog"
-        className="w-full max-w-[480px] rounded-t-card bg-paper-card p-5 shadow-sheet md:rounded-card"
+        className="w-full max-w-[480px] rounded-t-card border border-line/60 bg-paper-card p-5 shadow-sheet md:rounded-card"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="type-panel mb-4">Giao diện</h2>
@@ -31,12 +31,12 @@ export function ThemePanel({ theme, onChange, onClose }: Props) {
                 onChange(preset);
                 applyTheme(preset);
               }}
-              className={`rounded-cell border px-3 py-2 text-left type-btn capitalize ${
-                theme.id === preset.id ? "border-ink" : "border-line"
+              className={`ui-btn rounded-cell border px-3 py-3 text-left type-btn ${
+                theme.id === preset.id ? "border-ink shadow-float" : "border-line"
               }`}
               style={{ background: preset.paper, color: preset.ink }}
             >
-              {preset.id}
+              {THEME_LABELS[preset.id] ?? preset.id}
             </button>
           ))}
         </div>

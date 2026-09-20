@@ -7,6 +7,7 @@ import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   DAYS,
+  dayNumber,
   formatHours,
   hexToBg,
   todayIndex,
@@ -47,7 +48,7 @@ export function DayStrip({
             key={item.day}
             type="button"
             onClick={() => onChange(item.day)}
-            className={`flex min-h-11 flex-col items-center justify-center rounded-cell text-[12px] font-semibold leading-none ${
+            className={`ui-btn flex min-h-11 flex-col items-center justify-center rounded-cell text-[11px] font-semibold leading-none ${
               active
                 ? "bg-ink text-paper-card"
                 : isToday
@@ -56,13 +57,9 @@ export function DayStrip({
             }`}
           >
             <span>{item.short}</span>
-            {isToday ? (
-              <span className={`mt-1 text-[9px] font-medium ${active ? "text-paper-card/80" : ""}`}>
-                nay
-              </span>
-            ) : (
-              <span className="mt-1 h-[9px]" />
-            )}
+            <span className={`mt-0.5 font-mono text-[10px] font-medium ${active ? "text-paper-card/75" : "text-ink-faint"}`}>
+              {dayNumber(item.day)}
+            </span>
           </button>
         );
       })}
@@ -80,7 +77,6 @@ export function MobileDayView({
 }: Props) {
   const start = useRef<{ x: number; y: number } | null>(null);
   const rows = [...periods].sort((a, b) => a.order - b.order);
-  const label = DAYS.find((item) => item.day === day)?.label ?? "";
 
   return (
     <div
@@ -100,15 +96,14 @@ export function MobileDayView({
         onDayChange(next as DayIndex);
       }}
     >
-      <p className="mb-3 type-panel">{label}</p>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {rows.map((period) => {
           const jobs = findEntries(entries, period.id, day);
           const hours = formatHours(period.startTime, period.endTime);
           return (
             <section
               key={period.id}
-              className="rounded-card bg-paper-card p-3 shadow-[0_1px_0_var(--line-soft)]"
+              className="rounded-card border border-line/70 bg-paper-card p-3.5 shadow-card"
             >
               <div className="mb-2 flex items-baseline justify-between gap-2">
                 <h3 className="type-label text-ink">{period.name}</h3>
@@ -130,7 +125,7 @@ export function MobileDayView({
                 <button
                   type="button"
                   onClick={() => onOpenJob(period.id, day)}
-                  className="min-h-12 rounded-cell border border-dashed border-line text-[14px] font-medium text-ink-soft"
+                  className="ui-btn min-h-12 rounded-cell border border-dashed border-line text-[14px] font-medium text-ink-soft"
                 >
                   + Thêm việc {period.name.toLowerCase()}
                 </button>
@@ -159,13 +154,14 @@ function MobileJobCard({
       : CATEGORY_BG[entry.category];
   const hours = formatHours(entry.startTime, entry.endTime);
   const todos = visibleTodos(entry.todos);
+  const done = todos.filter((todo) => todo.done).length;
 
   return (
     <div
-      className="rounded-cell px-3 py-2.5"
+      className="rounded-cell px-3 py-3"
       style={{
         background: bg,
-        boxShadow: `inset 3px 0 0 ${accent}`,
+        boxShadow: `inset 4px 0 0 ${accent}`,
       }}
     >
       <button type="button" onClick={onOpen} className="block w-full text-left">
@@ -187,8 +183,15 @@ function MobileJobCard({
             {entry.note.trim()}
           </p>
         ) : null}
-        <div className="mt-1 type-tag" style={{ color: accent }}>
-          {CATEGORY_LABELS[entry.category]}
+        <div className="mt-2 flex items-center gap-2">
+          <div className="type-tag" style={{ color: accent }}>
+            {CATEGORY_LABELS[entry.category]}
+          </div>
+          {todos.length > 0 ? (
+            <span className="rounded-chip bg-paper-card/80 px-2 py-0.5 font-mono text-[11px] font-medium text-ink-soft">
+              {done}/{todos.length}
+            </span>
+          ) : null}
         </div>
       </button>
       {todos.length > 0 ? (

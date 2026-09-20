@@ -34,6 +34,7 @@ export function HomeClient() {
   const removeBoardSticker = useTkbStore((s) => s.removeBoardSticker);
 
   const [ready, setReady] = useState(false);
+  const [desktop, setDesktop] = useState<boolean | null>(null);
   const [slotsOpen, setSlotsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
@@ -60,6 +61,14 @@ export function HomeClient() {
     applyTheme(theme);
   }, [theme]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   if (!ready) {
     return (
       <div className="mx-auto max-w-[1280px] px-4 py-8 md:px-8">
@@ -72,9 +81,19 @@ export function HomeClient() {
   const existing = selected?.entryId
     ? entries.find((e) => e.id === selected.entryId)
     : undefined;
+  const desktopKnown = desktop !== null;
+  const mountDay = phoneLayout === "doc" && (!desktopKnown || desktop === false);
+  const mountWeek = phoneLayout === "ngang" || !desktopKnown || desktop === true;
+  const dayWrapClass = !desktopKnown ? "md:hidden" : undefined;
+  const weekWrapClass = !desktopKnown
+    ? phoneLayout === "ngang"
+      ? "block"
+      : "hidden md:block"
+    : undefined;
+  const weekCompact = desktop !== true && phoneLayout === "ngang";
 
   return (
-    <div className="mx-auto max-w-[1280px] px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] landscape:pb-[calc(3.25rem+env(safe-area-inset-bottom))] md:px-8 md:pb-7 md:pt-7">
+    <div className="mx-auto max-w-[1320px] px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-0 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] landscape:pb-[calc(3.25rem+env(safe-area-inset-bottom))] md:px-8 md:pb-8 md:pt-8">
       <TopBar
         decorating={decorate}
         phoneLayout={phoneLayout}
@@ -84,62 +103,63 @@ export function HomeClient() {
         onPhoneLayout={setPhoneLayout}
         onManage={() => setSlotsOpen(true)}
         dayStrip={
-          phoneLayout === "ngang" ? null : (
+          desktop === true || phoneLayout === "ngang" ? null : (
             <DayStrip day={viewDay} onChange={setViewDay} />
           )
         }
       />
 
-      {entries.length === 0 ? (
-        <div className="mb-4 mt-2">
-          <p className="type-panel">Thời khóa biểu của bạn còn trống</p>
-          <p className="mt-1 type-note text-ink-soft">
-            Bấm Thêm việc để thêm buổi học, ca làm hoặc việc nhà.
-          </p>
-        </div>
+      {entries.length === 0 && desktop === true ? (
+        <p className="mb-3 type-note text-ink-faint">
+          Bấm + trên ô trống để thêm việc. Dữ liệu lưu trên máy này.
+        </p>
       ) : (
-        <div className="h-3 md:h-4" />
+        <div className="h-2 md:h-1" />
       )}
 
-      <div className={phoneLayout === "ngang" ? "hidden" : "md:hidden"}>
-        <MobileDayView
-          periods={periods}
-          entries={entries}
-          day={viewDay}
-          onDayChange={setViewDay}
-          onOpenJob={(periodId, day, entryId) =>
-            setSelected({ periodId, day, entryId })
-          }
-          onToggleTodo={toggleTodo}
-        />
-      </div>
-
-      <div className={phoneLayout === "ngang" ? "block" : "hidden md:block"}>
-        {phoneLayout === "ngang" ? (
-          <p className="mb-2 type-note text-ink-soft md:hidden">
-            Vuốt ngang để xem đủ Thứ 2–CN.
-          </p>
-        ) : null}
-        <StickerBoard
-          stickers={boardStickers}
-          decorate={decorate}
-          onAdd={addBoardSticker}
-          onMove={moveBoardSticker}
-          onRemove={removeBoardSticker}
-        >
-          <WeekGrid
+      {mountDay ? (
+        <div className={dayWrapClass}>
+          <MobileDayView
             periods={periods}
             entries={entries}
-            selected={selected}
-            compact={phoneLayout === "ngang"}
-            onOpenJob={(periodId, day, entryId) => {
-              setViewDay(day);
-              setSelected({ periodId, day, entryId });
-            }}
+            day={viewDay}
+            onDayChange={setViewDay}
+            onOpenJob={(periodId, day, entryId) =>
+              setSelected({ periodId, day, entryId })
+            }
             onToggleTodo={toggleTodo}
           />
-        </StickerBoard>
-      </div>
+        </div>
+      ) : null}
+
+      {mountWeek ? (
+        <div className={weekWrapClass}>
+          {weekCompact ? (
+            <p className="mb-2 type-note text-ink-faint sm:hidden">
+              Vuốt ngang để xem đủ Thứ 2–CN.
+            </p>
+          ) : null}
+          <StickerBoard
+            stickers={boardStickers}
+            decorate={decorate}
+            onAdd={addBoardSticker}
+            onMove={moveBoardSticker}
+            onRemove={removeBoardSticker}
+          >
+            <WeekGrid
+              periods={periods}
+              entries={entries}
+              selected={selected}
+              compact={weekCompact}
+              onOpenJob={(periodId, day, entryId) => {
+                setViewDay(day);
+                setSelected({ periodId, day, entryId });
+              }}
+              onToggleTodo={toggleTodo}
+            />
+          </StickerBoard>
+        </div>
+      ) : null}
 
       {selected ? (
         <EditorSheet

@@ -111,12 +111,12 @@ export function ExportPreview({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/40 p-0 md:items-center md:p-4"
+      className="sheet-overlay fixed inset-0 z-[60] flex items-end justify-center p-0 md:items-center md:p-4"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="flex max-h-[92dvh] w-full max-w-[1100px] flex-col rounded-t-card bg-paper p-4 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-sheet md:rounded-card md:p-5"
+        className="flex max-h-[92dvh] w-full max-w-[1100px] flex-col rounded-t-card border border-line/60 bg-paper p-4 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-sheet md:rounded-card md:p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
